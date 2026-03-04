@@ -1,0 +1,97 @@
+# ========================
+# Environment & Secrets
+# ========================
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+*.pem
+*.key
+*.cert
+
+# ========================
+# Dependencies
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+combined.log
+error.log
+
+# ========================
+# Build & Output
+# ========================
+dist/
+build/
+out/
+.cache/
+
+# ========================
+# Uploads & Generated Files
+# ========================
+uploads/
+temp/
+tmp/
+invoices/
+exports/
+reports/
+
+# ========================
+# Database
+# ========================
+*.sqlite
+*.sqlite3
+*.db
+dump.rdb
+
+# ========================
+# OS Files
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# IDE & Editor
+# ========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+
+# ========================
+# Testing & Coverage
+# ========================
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+
+# ========================
+# Docker
+# ========================
+docker-compose.override.yml
+
+# ========================
+# Misc
+# ========================
+.npm
+.eslintcache
+.parcel-cache
+.turbo
