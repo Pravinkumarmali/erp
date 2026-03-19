@@ -1,83 +1,80 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import User from "./auth.model.js";
-import { JWT_SECRET } from "../../config/env.js";
+import PartyChallan from "./partyChallan.model.js";
 
-const generateAccessToken = (user) => {
-  return jwt.sign(
-    { id: user._id, role: user.role },
-    JWT_SECRET,
-    { expiresIn: "15m" }
-  );
-};
+// CREATE CHALLAN
+export const createChallan = async (data) => {
 
-const generateRefreshToken = (user) => {
-  return jwt.sign(
-    { id: user._id },
-    JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-};
+  // Calculate totals
+  let totalAmount = 0;
 
-export const registerUser = async (data) => {
-  const { name, email, password, role } = data;
+  const items = data.items.map((item) => {
+    const totalSarees = item.sareeQty + (item.sampleQty || 0);
+    const amount = item.sareeQty * item.rate;
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error("Email already exists");
-  }
+    totalAmount += amount;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    role
+    return {
+      ...item,
+      totalSarees,
+      amount,
+    };
   });
 
-  return user;
+  const challan = await PartyChallan.create({
+    ...data,
+    items,
+    totalAmount,
+  });
+
+  return challan;
 };
 
-export const loginUser = async (email, password) => {
-  const user = await User.findOne({ email });
 
-  if (!user) throw new Error("Invalid credentials");
-
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) throw new Error("Invalid credentials");
-
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
-
-  user.refreshToken = refreshToken;
-  await user.save();
-
-  return {
-    user,
-    accessToken,
-    refreshToken
-  };
+// GET ALL
+export const getAllChallans = async () => {
+  return await PartyChallan.find()
+    .populate("partyId", "name partyCode")
+    .sort({ createdAt: -1 });
 };
 
-// export const loginUser = async (email, password) => {
-//   const user = await User.findOne({ email });
-//   if (!user) {
-//     throw new Error("Invalid credentials");
-//   }
 
-//   const isMatch = await bcrypt.compare(password, user.password);
-//   if (!isMatch) {
-//     throw new Error("Invalid credentials");
-//   }
+// GET SINGLE
+export const getChallanById = async (id) => {
+  return await PartyChallan.findById(id)
+    .populate("partyId", "name partyCode");
+};
 
-//   const token = jwt.sign(
-//     { id: user._id, role: user.role },
-//     JWT_SECRET,
-//     { expiresIn: "7d" }
-//   );
 
-//   return { user, token };
-// };
+// UPDATE
+export const updateChallan = async (id, data) => {
 
+  let totalAmount = 0;
+
+  const items = data.items.map((item) => {
+    const totalSarees = item.sareeQty + (item.sampleQty || 0);
+    const amount = item.sareeQty * item.rate;
+
+    totalAmount += amount;
+
+    return {
+      ...item,
+      totalSarees,
+      amount,
+    };
+  });
+
+  return await PartyChallan.findByIdAndUpdate(
+    id,
+    {
+      ...data,
+      items,
+      totalAmount,
+    },
+    { new: true }
+  );
+};
+
+
+// DELETE
+export const deleteChallan = async (id) => {
+  return await PartyChallan.findByIdAndDelete(id);
+};

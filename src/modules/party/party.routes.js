@@ -1,29 +1,16 @@
 import express from "express";
-import { register, login, refreshTokenHandler } from "./auth.controller.js";
+import * as partyController from "./party.controller.js";
 
-const router = express.Router();
+const partyRoutes = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/refresh-token", refreshTokenHandler);
+partyRoutes.post("/", partyController.createParty);
 
-export default router;
+partyRoutes.get("/", partyController.getAllParties);
 
+partyRoutes.get("/:id", partyController.getPartyById);
 
+partyRoutes.put("/:id", partyController.updateParty);
 
+partyRoutes.delete("/:id", partyController.deleteParty);
 
-
-// import { protect } from "../../middlewares/auth.middleware.js";
-// import { authorizeRoles } from "../../middlewares/role.middleware.js";
-
-// router.get(
-//   "/admin-only",
-//   protect,
-//   authorizeRoles("admin"),
-//   (req, res) => {
-//     res.json({
-//       success: true,
-//       message: "Welcome Admin 🔥"
-//     });
-//   }
-// );
+export default partyRoutes;

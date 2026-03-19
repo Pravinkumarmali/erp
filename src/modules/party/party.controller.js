@@ -1,67 +1,87 @@
-import { registerUser, loginUser } from "./auth.service.js";
-import { registerSchema, loginSchema } from "./auth.validation.js";
+import * as partyService from "./party.service.js";
 
-export const register = async (req, res, next) => {
+export const createParty = async (req, res) => {
   try {
-    const { error } = registerSchema.validate(req.body);
-    if (error) throw new Error(error.details[0].message);
 
-    const user = await registerUser(req.body);
+    const party = await partyService.createParty(req.body);
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
-      data: user
+      message: "Party created successfully",
+      data: party
     });
-  } catch (err) {
-    next(err);
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
 
-export const login = async (req, res, next) => {
+
+export const getAllParties = async (req, res) => {
   try {
-    const { error } = loginSchema.validate(req.body);
-    if (error) throw new Error(error.details[0].message);
 
-    const { email, password } = req.body;
-    const data = await loginUser(email, password);
+    const parties = await partyService.getAllParties();
 
-    res.json({
+    res.status(200).json({
       success: true,
-      message: "Login successful",
-      data
+      data: parties
     });
-  } catch (err) {
-    next(err);
+
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
   }
 };
 
-export const refreshTokenHandler = async (req, res, next) => {
+
+export const getPartyById = async (req, res) => {
   try {
-    const { refreshToken } = req.body;
 
-    if (!refreshToken)
-      return res.status(401).json({ message: "Refresh token required" });
+    const party = await partyService.getPartyById(req.params.id);
 
-    const decoded = jwt.verify(refreshToken, JWT_SECRET);
-
-    const user = await User.findById(decoded.id);
-
-    if (!user || user.refreshToken !== refreshToken) {
-      return res.status(403).json({ message: "Invalid refresh token" });
+    if (!party) {
+      return res.status(404).json({ message: "Party not found" });
     }
 
-    const newAccessToken = jwt.sign(
-      { id: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    res.json(party);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const updateParty = async (req, res) => {
+  try {
+
+    const party = await partyService.updateParty(req.params.id, req.body);
 
     res.json({
       success: true,
-      accessToken: newAccessToken
+      data: party
     });
-  } catch (err) {
-    next(err);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+export const deleteParty = async (req, res) => {
+  try {
+
+    await partyService.deleteParty(req.params.id);
+
+    res.json({
+      success: true,
+      message: "Party deleted"
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

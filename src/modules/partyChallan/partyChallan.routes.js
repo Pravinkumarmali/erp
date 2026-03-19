@@ -1,29 +1,12 @@
 import express from "express";
-import { register, login, refreshTokenHandler } from "./auth.controller.js";
+import * as challanController from "./partyChallan.controller.js";
 
-const router = express.Router();
+const challanRoutes = express.Router();
 
-router.post("/register", register);
-router.post("/login", login);
-router.post("/refresh-token", refreshTokenHandler);
+challanRoutes.post("/", challanController.createChallan);
+challanRoutes.get("/", challanController.getAllChallans);
+challanRoutes.get("/:id", challanController.getChallanById);
+challanRoutes.put("/:id", challanController.updateChallan);
+challanRoutes.delete("/:id", challanController.deleteChallan);
 
-export default router;
-
-
-
-
-
-// import { protect } from "../../middlewares/auth.middleware.js";
-// import { authorizeRoles } from "../../middlewares/role.middleware.js";
-
-// router.get(
-//   "/admin-only",
-//   protect,
-//   authorizeRoles("admin"),
-//   (req, res) => {
-//     res.json({
-//       success: true,
-//       message: "Welcome Admin 🔥"
-//     });
-//   }
-// );
+export default challanRoutes;

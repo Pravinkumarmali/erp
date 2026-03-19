@@ -12,7 +12,7 @@ const partyChallanItemSchema = new mongoose.Schema({
   sampleQty: {
     type: Number,
     default: 0,
-  },
+  },  
   totalSarees: {
     type: Number,
     required: true,
